@@ -1,0 +1,161 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+virtualenv/
+
+# Environment Variables & Secrets
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+.env.test
+*.env
+.envrc
+secrets.json
+config.json
+settings.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+db.sqlite3
+database.db
+local.db
+*.sql
+*.dump
+
+# Logs
+*.log
+logs/
+log/
+*.log.*
+pip-log.txt
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.code-workspace
+.project
+.pydevproject
+.settings/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.pytest/
+
+# Distribution & Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Type Checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Certificates & Keys
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+ssl/
+certs/
+private/
+
+# Backup & Temporary Files
+*.bak
+*.tmp
+*.temp
+*~
+.~*
+backup/
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# API Keys & Tokens
+*api_key*
+*apikey*
+*secret*
+*token*
+*credentials*
+.credentials
+credentials.json
+
+# Docker (se usar)
+*.env.docker
+docker-compose.override.yml
+
+# Media & Uploads (caso tenha uploads de usuários)
+media/
+uploads/
+files/
+static/uploads/
+
+# Cache
+.cache/
+*.cache
+.sass-cache/
+
+# Misc
+*.pid
+celerybeat-schedule
+celerybeat.pid
+instance/
+.webassets-cache
