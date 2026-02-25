@@ -1,0 +1,114 @@
+# Docker Compose para desenvolvimento local
+# Orquestra: API FastAPI, PostgreSQL, pgAdmin4
+
+version: '3.8'
+
+services:
+  # ==============================================
+  # PostgreSQL Database
+  # ==============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: swellwise-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: swellwise
+      POSTGRES_PASSWORD: swellwise123
+      POSTGRES_DB: swellwise
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d  # Scripts de inicialização
+    ports:
+      - "5432:5432"
+    networks:
+      - swellwise-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swellwise"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==============================================
+  # pgAdmin4 - Interface visual para PostgreSQL
+  # ==============================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: swellwise-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@swellwise.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - swellwise-network
+    depends_on:
+      - postgres
+
+  # ==============================================
+  # FastAPI Backend
+  # ==============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: swellwise-api
+    restart: unless-stopped
+    environment:
+      # App
+      DEBUG: "True"
+      
+      # Database
+      POSTGRES_USER: swellwise
+      POSTGRES_PASSWORD: swellwise123
+      POSTGRES_SERVER: postgres  # Nome do serviço Docker
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: swellwise
+      
+      # Groq AI (opcional)
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_ENABLED: ${GROQ_ENABLED:-True}
+      
+      # Cache
+      CACHE_ENABLED: "True"
+      CACHE_TTL: "1800"
+    volumes:
+      - ./app:/app/app  # Hot reload em desenvolvimento
+      - ./alembic:/app/alembic
+    ports:
+      - "8000:8000"
+    networks:
+      - swellwise-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Aguardando PostgreSQL...' &&
+        sleep 5 &&
+        echo 'Executando migrations...' &&
+        alembic upgrade head &&
+        echo 'Iniciando servidor FastAPI...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+# ==============================================
+# Networks
+# ==============================================
+networks:
+  swellwise-network:
+    driver: bridge
+    name: swellwise-network
+
+# ==============================================
+# Volumes Persistentes
+# ==============================================
+volumes:
+  postgres_data:
+    name: swellwise-postgres-data
+  pgadmin_data:
+    name: swellwise-pgadmin-data

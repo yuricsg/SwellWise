@@ -1,0 +1,108 @@
+# Docker Compose para PRODUÇÃO
+# Versão otimizada para deploy
+
+version: '3.8'
+
+services:
+  # ==============================================
+  # PostgreSQL Database (Produção)
+  # ==============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: swellwise-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - swellwise-network-prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    # Não expor porta externamente em produção
+    # apenas comunicação interna via rede Docker
+
+  # ==============================================
+  # FastAPI Backend (Produção)
+  # ==============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: swellwise-api-prod
+    restart: always
+    environment:
+      # App
+      DEBUG: "False"
+      
+      # Database
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_SERVER: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      
+      # Groq AI
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_ENABLED: "True"
+      
+      # Cache
+      CACHE_ENABLED: "True"
+      CACHE_TTL: "1800"
+      
+      # CORS - Adicionar domínio de produção
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+    ports:
+      - "8000:8000"
+    networks:
+      - swellwise-network-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Aguardando PostgreSQL...' &&
+        sleep 10 &&
+        echo 'Executando migrations...' &&
+        alembic upgrade head &&
+        echo 'Iniciando servidor FastAPI (Produção)...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+      "
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==============================================
+  # Nginx Reverse Proxy (Opcional)
+  # ==============================================
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: swellwise-nginx
+  #   restart: always
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   networks:
+  #     - swellwise-network-prod
+  #   depends_on:
+  #     - api
+
+networks:
+  swellwise-network-prod:
+    driver: bridge
+    name: swellwise-network-prod
+
+volumes:
+  postgres_data_prod:
+    name: swellwise-postgres-data-prod
