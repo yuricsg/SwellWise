@@ -11,7 +11,6 @@ router = APIRouter(prefix="/beaches", tags=["beaches"])
 
 
 # Database temporário em memória
-# TODO: Mover para banco de dados real
 BEACHES_DATABASE = [
     {
         "id": "1",

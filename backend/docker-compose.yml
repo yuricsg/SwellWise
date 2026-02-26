@@ -29,9 +29,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # ==============================================
-  # pgAdmin4 - Interface visual para PostgreSQL
-  # ==============================================
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: swellwise-pgadmin
@@ -96,17 +93,11 @@ services:
         uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
 
-# ==============================================
-# Networks
-# ==============================================
 networks:
   swellwise-network:
     driver: bridge
     name: swellwise-network
 
-# ==============================================
-# Volumes Persistentes
-# ==============================================
 volumes:
   postgres_data:
     name: swellwise-postgres-data
