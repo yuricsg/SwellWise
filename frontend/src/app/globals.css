@@ -58,9 +58,15 @@ body {
 /* Glassmorphism Utilities */
 .glass-panel {
   background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid var(--card-border);
+}
+
+/* Fixed header specific styles */
+header[class*="fixed"] {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* Scrollbar customization */
@@ -111,4 +117,64 @@ body {
   -webkit-text-fill-color: transparent;
   background-size: 200% 200%;
   animation: wave-text 5s ease infinite;
+}
+
+/* Typography improvements for responsive design */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Better touch targets for mobile */
+@media (max-width: 768px) {
+  button, a, select {
+    min-height: 44px;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+}
+
+/* Focus visible styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Optimize font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* Container query support for future-proofing */
+@container (min-width: 640px) {
+  .container-responsive {
+    padding: 1.5rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .glass-panel {
+    background: white;
+    border: 1px solid #ccc;
+  }
 }

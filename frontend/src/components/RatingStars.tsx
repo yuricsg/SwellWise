@@ -28,23 +28,23 @@ export default function RatingStars({ rating, label, icon }: RatingStarsProps) {
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-end mb-2">
-        <div className="flex items-center gap-2">
-          {icon && <span className="text-lg opacity-80">{icon}</span>}
-          <span className="text-sm font-semibold text-white tracking-wide">{label}</span>
+      <div className="flex justify-between items-end mb-1.5 sm:mb-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {icon && <span className="text-base sm:text-lg opacity-80">{icon}</span>}
+          <span className="text-xs sm:text-sm font-semibold text-white tracking-wide">{label}</span>
         </div>
-        <div className="flex items-baseline gap-1">
-          <span className={`text-xl font-black tabular-nums leading-none ${textClass}`}>
+        <div className="flex items-baseline gap-0.5 sm:gap-1">
+          <span className={`text-lg sm:text-xl font-black tabular-nums leading-none ${textClass}`}>
             {score.toFixed(1)}
           </span>
-          <span className="text-[10px] text-muted font-bold">/10</span>
+          <span className="text-[9px] sm:text-[10px] text-muted font-bold">/10</span>
         </div>
       </div>
       
       {/* Sleek Progress Bar */}
       <div className="h-1.5 w-full bg-surface-border/50 rounded-full overflow-hidden">
         <div 
-          className={`h-full bg-gradient-to-r ${colorClass} rounded-full transition-all duration-1000 ease-out`}
+          className={`h-full bg-linear-to-r ${colorClass} rounded-full transition-all duration-1000 ease-out`}
           style={{ width: `${percentage}%` }}
         />
       </div>
