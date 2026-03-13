@@ -47,15 +47,13 @@ app.add_middleware(
 
 # Registrar rotas
 app.include_router(health.router)
-app.include_router(beaches.router, prefix="/api/v1")
-app.include_router(conditions.router, prefix="/api/v1")
+app.include_router(beaches.router)
+app.include_router(conditions.router)
 
 
 @app.get("/")
 async def root():
-    """
-    Endpoint raiz - Informações sobre a API
-    """
+
     return {
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
@@ -63,8 +61,8 @@ async def root():
         "docs": "/docs",
         "health": "/health",
         "endpoints": {
-            "beaches": "/api/v1/beaches",
-            "conditions": "/api/v1/conditions/{beach_id}"
+            "beaches": "/beaches",
+            "conditions": "/conditions/{beach_id}"
         },
         "status": "online"
     }
