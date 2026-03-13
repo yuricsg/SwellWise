@@ -25,23 +25,7 @@ logger = logging.getLogger(__name__)
 
 @router.get("/{beach_id}", response_model=BeachCondition)
 async def get_beach_conditions(beach_id: str):
-    """
-    Retorna as condições atuais completas de uma praia
     
-    Inclui:
-    - Dados de ondas (altura, período, direção)
-    - Dados de vento (velocidade, direção, rajadas)
-    - Dados meteorológicos (temperatura, clima, visibilidade)
-    - Ratings para surf, banho e pesca (0-10)
-    - Análise e recomendações geradas por IA
-    
-    Args:
-        beach_id: ID da praia
-        
-    Returns:
-        Condições completas da praia
-    """
-    # Buscar praia no banco
     beach = next((b for b in BEACHES_DATABASE if b["id"] == beach_id), None)
     
     if not beach:
@@ -66,7 +50,6 @@ async def get_beach_conditions(beach_id: str):
                 detail="Erro ao buscar dados meteorológicos. Tente novamente."
             )
         
-        # Gerar análise com IA
         logger.info(f"Gerando análise IA para {beach['name']}")
         ai_service = AIService()
         ai_analysis = await ai_service.generate_beach_review(
