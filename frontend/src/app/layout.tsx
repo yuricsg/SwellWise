@@ -13,8 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SwellWise",
-  description: "",
+  title: "SwellWise - Condições de Praias com IA",
+  description:
+    "Descubra as melhores praias do Brasil com condições em tempo real, previsões detalhadas e análises inteligentes com IA.",
+  keywords: [
+    "praias",
+    "surf",
+    "ondas",
+    "previsão",
+    "inteligência artificial",
+    "brasil",
+    "litoral",
+  ],
 };
 
 export default function RootLayout({
@@ -23,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
