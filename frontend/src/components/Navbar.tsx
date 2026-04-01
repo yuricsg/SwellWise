@@ -1,81 +1,60 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
+import Link from 'next/link';
+import { Waves, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <header 
-      className="fixed w-full top-0 z-50 border-b border-surface-border/50 backdrop-blur-xl shadow-lg shadow-black/20" 
-      style={{ backgroundColor: 'rgba(6, 17, 33, 0.85)' }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-        <Link href="/">
-          <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
-            <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-blue/10 border border-brand-cyan/20 group-hover:border-brand-cyan/50 transition-colors">
-              <span className="text-xl sm:text-2xl transform group-hover:scale-110 transition-transform">🌊</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white group-hover:text-brand-cyan transition-colors">
-              SwellWise
-            </h1>
-          </div>
-        </Link>
-        
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-6 lg:gap-8 text-sm font-medium">
-          <Link
-            href="/"
-            className="text-white hover:text-brand-cyan transition-colors"
-          >
-            Explorar Praias
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/60 backdrop-blur-xl border border-border/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <Link href="/" className="flex items-center gap-2">
+            <Waves className="h-6 w-6 text-primary" />
+            <span className="text-lg font-bold text-foreground tracking-tight">SwellWise</span>
           </Link>
-          <Link
-            href="/about"
-            className="text-muted hover:text-white transition-colors"
-          >
-            Sobre
-          </Link>
-        </nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-white hover:text-brand-cyan transition-colors"
-          aria-label="Toggle menu"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {mobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+          <div className="hidden md:flex items-center gap-8">
+            {['Explorar', 'Previsões', 'API', 'Sobre'].map((item) => (
+              <a
+                key={item}
+                href="#"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden md:flex items-center gap-3">
+            <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5">
+              Entrar
+            </button>
+            <button className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
+              Começar Grátis
+            </button>
+          </div>
+
+          <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-surface-border/50 animate-fade-in" style={{ backgroundColor: 'rgba(6, 17, 33, 0.95)' }}>
-          <nav className="flex flex-col px-4 py-4 gap-3">
-            <Link
-              href="/"
-              className="text-white hover:text-brand-cyan transition-colors py-2 px-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Explorar Praias
-            </Link>
-            <Link
-              href="/about"
-              className="text-muted hover:text-white transition-colors py-2 px-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Sobre
-            </Link>
-          </nav>
+      {open && (
+        <div className="md:hidden bg-card/60 backdrop-blur-xl border-t border-border/50 px-4 pb-4 pt-2 space-y-2">
+          {['Explorar', 'Previsões', 'API', 'Sobre'].map((item) => (
+            <a key={item} href="#" className="block text-sm text-muted-foreground hover:text-foreground py-2">
+              {item}
+            </a>
+          ))}
+          <button className="w-full text-sm font-medium bg-primary text-primary-foreground px-4 py-2.5 rounded-lg mt-2">
+            Começar Grátis
+          </button>
         </div>
       )}
-    </header>
+    </nav>
   );
 }
