@@ -52,7 +52,7 @@ export default function Home() {
               className={cn(
                 'bg-secondary border border-border/60 text-foreground text-sm rounded-xl px-4 py-2.5',
                 'outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer',
-                'transition-colors min-w-[180px]'
+                'transition-colors min-w-45'
               )}
             >
               <option value="">Todos os Estados</option>

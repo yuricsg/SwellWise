@@ -18,12 +18,6 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        <div className="animate-fade-in">
-          <div className="inline-flex items-center gap-2 bg-card/60 backdrop-blur-xl border border-border/50 rounded-full px-4 py-1.5 mb-8">
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-medium text-muted-foreground">Powered by AI</span>
-          </div>
-        </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-foreground mb-6 animate-slide-up">
           Descubra o melhor do{' '}
@@ -48,7 +42,7 @@ export default function HeroSection() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-6 mt-16 max-w-lg mx-auto animate-slide-up" style={{ animationDelay: '450ms' }}>
           {[
-            { value: '2.400+', label: 'Praias' },
+            { value: '100+', label: 'Praias' },
             { value: '26', label: 'Estados' },
             { value: '98%', label: 'Precisão' },
           ].map((stat) => (

@@ -1,3 +1,5 @@
+'use client';
+
 export default function LoadingSpinner() {
   return (
     <div className="inline-flex items-center justify-center">

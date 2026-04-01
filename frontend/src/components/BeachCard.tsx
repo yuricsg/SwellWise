@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import type { Beach } from '@/types/beach';
+
 interface BeachCardProps {
-  beach: any;
+  beach: Beach;
   index?: number;
 }
 
@@ -32,14 +34,14 @@ export default function BeachCard({ beach, index = 0 }: BeachCardProps) {
         style={{ animationDelay: `${index * 80}ms` }}
       >
         {/* Image */}
-        <div className={cn('relative h-52 overflow-hidden bg-gradient-to-br', colorStyle)}>
+        <div className={cn('relative h-52 overflow-hidden bg-linear-to-br', colorStyle)}>
           <div className="w-full h-full flex items-center justify-center">
             <div className="text-center">
               <div className="text-5xl mb-2 opacity-80">🌊</div>
               <p className="text-white/60 text-sm font-medium">{beach.state}</p>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-card/80 to-transparent" />
         </div>
 
         {/* Content */}

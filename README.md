@@ -117,14 +117,6 @@ SwellWise/
 - ✅ **IA integrada** - Análises inteligentes com Groq
 - ✅ **Responsivo** - Adaptado para mobile/tablet/desktop
 
-## Próximos Passos
-
-- [ ] Autenticação de usuários
-- [ ] Favoritos e preferências personalizadas
-- [ ] Sistema de notificações
-- [ ] Histórico de análises
-- [ ] App mobile (React Native)
-
 ---
 
 > Desenvolvido por um amante de praias e surfista de final de semana :)
