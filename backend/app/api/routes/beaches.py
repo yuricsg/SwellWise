@@ -1,192 +1,155 @@
 """
 Rotas para gerenciamento de praias
+Integra com PostgreSQL via SQLAlchemy
 """
-from fastapi import APIRouter, HTTPException, Query
-from typing import List, Optional
-from datetime import datetime
+from fastapi import APIRouter, HTTPException, Query, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func, or_
+from typing import Optional
+import logging
 
+from app.core.database import get_async_db
+from app.models.beach import Beach
 from app.schemas.beach import BeachResponse, BeachList
 
 router = APIRouter(prefix="/beaches", tags=["beaches"])
+logger = logging.getLogger(__name__)
 
 
-# Database temporário em memória
-BEACHES_DATABASE = [
-    {
-        "id": "1",
-        "name": "Maracaípe",
-        "city": "Ipojuca",
-        "state": "PE",
-        "latitude": -8.5071,
-        "longitude": -35.0217,
-        "description": "Praia famosa mundialmente por suas ondas perfeitas para surf. Oferece ondas tubulares e é sede de campeonatos internacionais.",
-        "created_at": datetime.now()
-    },
-    {
-        "id": "2",
-        "name": "Boa Viagem",
-        "city": "Recife",
-        "state": "PE",
-        "latitude": -8.1289,
-        "longitude": -34.9043,
-        "description": "Praia urbana de 7km protegida por recifes naturais. Popular para caminhadas e banhos em mar calmo.",
-        "created_at": datetime.now()
-    },
-    {
-        "id": "3",
-        "name": "Porto de Galinhas",
-        "city": "Ipojuca",
-        "state": "PE",
-        "latitude": -8.5042,
-        "longitude": -35.0044,
-        "description": "Uma das praias mais famosas do Brasil, conhecida pelas piscinas naturais e águas cristalinas.",
-        "created_at": datetime.now()
-    },
-    {
-        "id": "4",
-        "name": "Carneiros",
-        "city": "Tamandaré",
-        "state": "PE",
-        "latitude": -8.7078,
-        "longitude": -35.0839,
-        "description": "Praia paradisíaca com águas calmas e mornas, coqueiros e uma capela histórica à beira-mar.",
-        "created_at": datetime.now()
-    },
-    {
-        "id": "5",
-        "name": "Copacabana",
-        "city": "Rio de Janeiro",
-        "state": "RJ",
-        "latitude": -22.9711,
-        "longitude": -43.1822,
-        "description": "Praia icônica do Rio de Janeiro com 4km de extensão. Famosa mundialmente por sua orla e calçadão.",
-        "created_at": datetime.now()
-    },
-    {
-        "id": "6",
-        "name": "Ipanema",
-        "city": "Rio de Janeiro",
-        "state": "RJ",
-        "latitude": -22.9838,
-        "longitude": -43.2047,
-        "description": "Praia sofisticada e cosmopolita, famosa pelo Posto 9 e pelo pôr do sol no Arpoador.",
-        "created_at": datetime.now()
-    },
-    {
-        "id": "7",
-        "name": "Jericoacoara",
-        "city": "Jijoca de Jericoacoara",
-        "state": "CE",
-        "latitude": -2.7928,
-        "longitude": -40.5147,
-        "description": "Paraíso do kitesurf com dunas, lagoas e pôr do sol espetacular. Ventos constantes durante o ano todo.",
-        "created_at": datetime.now()
-    },
-    {
-        "id": "8",
-        "name": "Maresias",
-        "city": "São Sebastião",
-        "state": "SP",
-        "latitude": -23.7986,
-        "longitude": -45.5522,
-        "description": "Principal point de surf do litoral paulista. Ondas consistentes e boa infraestrutura.",
-        "created_at": datetime.now()
-    },
-]
+def _beach_to_response(beach: Beach) -> BeachResponse:
+    """Converte modelo SQLAlchemy para schema de resposta com tags derivadas"""
+    tags = []
+    if beach.has_surf_schools:
+        tags.append("surf")
+    if beach.has_restaurants:
+        tags.append("restaurantes")
+    if beach.has_parking:
+        tags.append("estacionamento")
+    if beach.has_infrastructure:
+        tags.append("infra completa")
+    if beach.surf_quality in ("excellent", "good"):
+        tags.append("ondas perfeitas")
+    if beach.best_season:
+        tags.append(f"melhor época: {beach.best_season}")
+
+    return BeachResponse(
+        id=beach.id,
+        name=beach.name,
+        city=beach.city,
+        state=beach.state,
+        latitude=beach.latitude,
+        longitude=beach.longitude,
+        description=beach.description,
+        slug=beach.slug,
+        region=beach.region,
+        surf_quality=beach.surf_quality,
+        best_season=beach.best_season,
+        tags=tags,
+        warning=beach.warning,
+        created_at=beach.created_at,
+    )
 
 
 @router.get("/", response_model=BeachList)
 async def list_beaches(
     state: Optional[str] = Query(None, description="Filtrar por estado (UF)", max_length=2),
     city: Optional[str] = Query(None, description="Filtrar por cidade"),
-    search: Optional[str] = Query(None, description="Buscar por nome da praia")
+    search: Optional[str] = Query(None, description="Buscar por nome da praia"),
+    limit: int = Query(6, ge=1, le=50, description="Número de praias por página"),
+    offset: int = Query(0, ge=0, description="Número de praias para pular"),
+    db: AsyncSession = Depends(get_async_db),
 ):
-    """
-    Lista todas as praias disponíveis no sistema
-    
-    Pode filtrar por:
-    - Estado (UF)
-    - Cidade
-    - Nome (busca parcial)
-    """
-    beaches = BEACHES_DATABASE.copy()
-    
-    # Aplicar filtros
-    if state:
-        beaches = [b for b in beaches if b["state"].upper() == state.upper()]
-    
-    if city:
-        beaches = [b for b in beaches if city.lower() in b["city"].lower()]
-    
-    if search:
-        beaches = [b for b in beaches if search.lower() in b["name"].lower()]
-    
-    return {
-        "total": len(beaches),
-        "beaches": beaches
-    }
+    try:
+        query = select(Beach).where(Beach.is_active == True)
+
+        if state:
+            query = query.where(Beach.state == state.upper())
+
+        if city:
+            query = query.where(Beach.city.ilike(f"%{city}%"))
+
+        if search:
+            query = query.where(
+                or_(
+                    Beach.name.ilike(f"%{search}%"),
+                    Beach.city.ilike(f"%{search}%"),
+                )
+            )
+
+        count_query = select(func.count()).select_from(query.subquery())
+        total_result = await db.execute(count_query)
+        total = total_result.scalar() or 0
+
+        query = query.order_by(Beach.name).limit(limit).offset(offset)
+        result = await db.execute(query)
+        beaches = result.scalars().all()
+
+        beach_list = [_beach_to_response(b) for b in beaches]
+
+        return BeachList(
+            total=total,
+            limit=limit,
+            offset=offset,
+            has_more=(offset + limit) < total,
+            beaches=beach_list,
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao listar praias: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao buscar praias no banco de dados"
+        )
 
 
 @router.get("/{beach_id}", response_model=BeachResponse)
-async def get_beach(beach_id: str):
+async def get_beach(
+    beach_id: str,
+    db: AsyncSession = Depends(get_async_db),
+):
     """
     Retorna informações detalhadas de uma praia específica
-    
+
     Args:
         beach_id: ID da praia
     """
-    beach = next((b for b in BEACHES_DATABASE if b["id"] == beach_id), None)
-    
-    if not beach:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Praia com ID '{beach_id}' não encontrada"
+    try:
+        result = await db.execute(
+            select(Beach).where(Beach.id == beach_id, Beach.is_active == True)
         )
-    
-    return beach
+        beach = result.scalar_one_or_none()
 
+        if not beach:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Praia com ID '{beach_id}' não encontrada"
+            )
 
-@router.get("/state/{state_uf}")
-async def get_beaches_by_state(state_uf: str):
-    """
-    Lista todas as praias de um estado específico
-    
-    Args:
-        state_uf: Sigla do estado (ex: PE, RJ, SP)
-    """
-    beaches = [b for b in BEACHES_DATABASE if b["state"].upper() == state_uf.upper()]
-    
-    if not beaches:
+        return _beach_to_response(beach)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao buscar praia {beach_id}: {e}", exc_info=True)
         raise HTTPException(
-            status_code=404,
-            detail=f"Nenhuma praia encontrada para o estado '{state_uf}'"
+            status_code=500,
+            detail="Erro ao buscar praia no banco de dados"
         )
-    
-    return {
-        "state": state_uf.upper(),
-        "total": len(beaches),
-        "beaches": beaches
-    }
 
 
-@router.get("/city/{city_name}")
-async def get_beaches_by_city(city_name: str):
-    """
-    Lista todas as praias de uma cidade específica
+@router.get("/state/{state_uf}", response_model=BeachList)
+async def get_beaches_by_state(
+    state_uf: str,
+    limit: int = Query(6, ge=1, le=50),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_async_db),
+):
     
-    Args:
-        city_name: Nome da cidade
-    """
-    beaches = [b for b in BEACHES_DATABASE if city_name.lower() in b["city"].lower()]
-    
-    if not beaches:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Nenhuma praia encontrada para a cidade '{city_name}'"
-        )
-    
-    return {
-        "city": city_name,
-        "total": len(beaches),
-        "beaches": beaches
-    }
+    return await list_beaches(
+        state=state_uf,
+        city=None,
+        search=None,
+        limit=limit,
+        offset=offset,
+        db=db,
+    )
