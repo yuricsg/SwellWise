@@ -1,85 +1,153 @@
-// Service para consumir a API SwellWise
+/**
+ * API Service - Handles all HTTP requests to the backend
+ */
+
+import axios, { AxiosInstance, AxiosError } from "axios";
 import type {
   Beach,
-  BeachListResponse,
+  BeachList,
   BeachCondition,
   BeachForecast,
-} from "@/types";
+} from "@/types/beach";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+/**
+ * API Error type
+ */
+export interface ApiError {
+  message: string;
+  status?: number;
+  details?: unknown;
+}
 
-class ApiService {
-  private async fetcher<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store", // Sempre buscar dados frescos
-    });
+/**
+ * Create and configure axios instance
+ */
+const createApiClient = (): AxiosInstance => {
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
+  return axios.create({
+    baseURL,
+    timeout: 30000,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
 
-    return response.json();
+const api = createApiClient();
+
+/**
+ * Handle API errors consistently
+ */
+const handleError = (error: unknown): ApiError => {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<{ detail?: string }>;
+    return {
+      message: axiosError.response?.data?.detail || axiosError.message || "Erro na requisição",
+      status: axiosError.response?.status,
+      details: axiosError.response?.data,
+    };
   }
 
-  // Listar todas as praias
+  if (error instanceof Error) {
+    return {
+      message: error.message,
+    };
+  }
+
+  return {
+    message: "Erro desconhecido",
+  };
+};
+
+/**
+ * Beach API endpoints
+ */
+export const beachService = {
+  /**
+   * Get all beaches with optional filters
+   */
   async getBeaches(params?: {
     state?: string;
     city?: string;
-    region?: string;
-    page?: number;
-    page_size?: number;
-  }): Promise<BeachListResponse> {
-    const queryParams = new URLSearchParams();
-    
-    if (params?.state) queryParams.append("state", params.state);
-    if (params?.city) queryParams.append("city", params.city);
-    if (params?.region) queryParams.append("region", params.region);
-    if (params?.page) queryParams.append("page", params.page.toString());
-    if (params?.page_size) queryParams.append("page_size", params.page_size.toString());
+    search?: string;
+  }): Promise<BeachList> {
+    try {
+      const response = await api.get<BeachList>("/beaches", { params });
+      return response.data;
+    } catch (error) {
+      throw handleError(error);
+    }
+  },
 
-    const query = queryParams.toString();
-    return this.fetcher<BeachListResponse>(
-      `/beaches${query ? `?${query}` : ""}`
-    );
-  }
-
-  // Buscar praia por ID
+  /**
+   * Get a single beach by ID
+   */
   async getBeachById(beachId: string): Promise<Beach> {
-    return this.fetcher<Beach>(`/beaches/${beachId}`);
-  }
+    try {
+      const response = await api.get<Beach>(`/beaches/${beachId}`);
+      return response.data;
+    } catch (error) {
+      throw handleError(error);
+    }
+  },
 
-  // Buscar praias por estado
-  async getBeachesByState(state: string): Promise<Beach[]> {
-    return this.fetcher<Beach[]>(`/beaches/state/${state}`);
-  }
+  /**
+   * Get beaches by state
+   */
+  async getBeachesByState(stateUf: string): Promise<BeachList> {
+    try {
+      const response = await api.get<BeachList>(`/beaches/state/${stateUf}`);
+      return response.data;
+    } catch (error) {
+      throw handleError(error);
+    }
+  },
+};
 
-  // Buscar praias por cidade
-  async getBeachesByCity(city: string): Promise<Beach[]> {
-    return this.fetcher<Beach[]>(`/beaches/city/${city}`);
-  }
-
-  // Buscar condições atuais de uma praia
+/**
+ * Conditions API endpoints
+ */
+export const conditionService = {
+  /**
+   * Get current conditions for a beach
+   */
   async getBeachConditions(beachId: string): Promise<BeachCondition> {
-    return this.fetcher<BeachCondition>(`/conditions/${beachId}`);
-  }
+    try {
+      const response = await api.get<BeachCondition>(`/conditions/${beachId}`);
+      return response.data;
+    } catch (error) {
+      throw handleError(error);
+    }
+  },
 
-  // Buscar previsão de uma praia
-  async getBeachForecast(
-    beachId: string,
-    days: number = 7
-  ): Promise<BeachForecast> {
-    return this.fetcher<BeachForecast>(
-      `/conditions/${beachId}/forecast?days=${days}`
-    );
-  }
+  /**
+   * Get extended forecast for a beach
+   */
+  async getBeachForecast(beachId: string, days: number = 7): Promise<BeachForecast> {
+    try {
+      const response = await api.get<BeachForecast>(`/conditions/${beachId}/forecast`, {
+        params: { days: Math.min(Math.max(days, 1), 16) },
+      });
+      return response.data;
+    } catch (error) {
+      throw handleError(error);
+    }
+  },
+};
 
-  // Health check
-  async healthCheck(): Promise<{ status: string; database: string }> {
-    return this.fetcher("/health");
-  }
-}
+/**
+ * Health check
+ */
+export const healthService = {
+  async check(): Promise<boolean> {
+    try {
+      await api.get("/health");
+      return true;
+    } catch {
+      return false;
+    }
+  },
+};
 
-export const apiService = new ApiService();
+export default api;

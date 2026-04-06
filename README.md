@@ -11,9 +11,11 @@
 
 ## Sobre o Projeto
 
-SwellWise é uma **plataforma web moderna** que fornece análises inteligentes e em tempo real sobre as condições de praias brasileiras. Integrada com dados meteorológicos e marinhos, a aplicação utiliza IA para gerar recomendações personalizadas para **surf, banho e pesca**.
+SwellWise é uma **plataforma web moderna** que eu decidi criar que fornece análises inteligentes e em tempo real sobre as condições de praias brasileiras. O foco aqui foi criar uma solução para muitos banhistas que desejam ver qual a melhor hora para irem a praia que desejam, e também para surfistas que desejam saber aquele pico ideal para pegar ondas. A plataforma é Integrada com dados meteorológicos e marinhos, a aplicação utiliza IA para gerar recomendações personalizadas para **surf, banho e pesca**. Tudo foi feito de forma gratuita e acessíve, espero que gostem :)
 
-### Funcionalidades Principais
+---
+
+### Funcionalidades Principais:
 - Consulta de praias com dados em tempo real
 - Análise de ondas, vento e clima
 - Recomendações inteligentes via IA
@@ -116,14 +118,6 @@ SwellWise/
 - ✅ **Containerizado** - Deploy simplificado com Docker
 - ✅ **IA integrada** - Análises inteligentes com Groq
 - ✅ **Responsivo** - Adaptado para mobile/tablet/desktop
-
-## Próximos Passos
-
-- [ ] Autenticação de usuários
-- [ ] Favoritos e preferências personalizadas
-- [ ] Sistema de notificações
-- [ ] Histórico de análises
-- [ ] App mobile (React Native)
 
 ---
 

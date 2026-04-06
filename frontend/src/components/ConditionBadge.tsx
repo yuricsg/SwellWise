@@ -1,4 +1,4 @@
-// Modern Condition Badge Component
+'use client';
 
 interface ConditionBadgeProps {
   label: string;
@@ -12,33 +12,38 @@ export default function ConditionBadge({
   label,
   value,
   icon,
-  unit = "",
+  unit = '',
   highlight = false,
 }: ConditionBadgeProps) {
   return (
-    <div className={`
-      relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col
-      ${highlight 
-        ? 'bg-linear-to-br from-brand-blue/20 to-brand-cyan/10 border border-brand-cyan/30 shadow-[inset_0_0_20px_rgba(0,240,255,0.05)]' 
-        : 'glass-panel'}
-    `}>
-      <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <span className="text-[10px] sm:text-xs font-bold tracking-wider uppercase text-muted">
+    <div
+      className={`
+        relative overflow-hidden rounded-2xl p-5 flex flex-col cursor-default
+        transition-all duration-300 hover:-translate-y-0.5
+        ${
+          highlight
+            ? 'bg-primary/15 border border-primary/40 shadow-lg shadow-primary/10'
+            : 'bg-card/60 backdrop-blur-xl border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5'
+        }
+      `}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[10px] font-bold tracking-wider uppercase text-muted-foreground">
           {label}
         </span>
-        {icon && (
-          <div className="text-xl sm:text-2xl opacity-80 filter drop-shadow-md">
-            {icon}
-          </div>
-        )}
+        {icon && <span className="text-xl opacity-70">{icon}</span>}
       </div>
-      
-      <div className="mt-auto flex items-baseline gap-1">
-        <span className={`text-3xl sm:text-4xl font-black tabular-nums tracking-tight ${highlight ? 'text-white' : 'text-slate-100'}`}>
+
+      <div className="mt-auto flex items-baseline gap-1.5">
+        <span
+          className={`text-2xl sm:text-3xl font-black tabular-nums tracking-tight ${
+            highlight ? 'text-primary' : 'text-foreground'
+          }`}
+        >
           {value}
         </span>
         {unit && (
-          <span className={`text-base sm:text-lg font-medium mb-1 ${highlight ? 'text-brand-cyan' : 'text-muted'}`}>
+          <span className={`text-xs font-bold ${highlight ? 'text-primary' : 'text-muted-foreground'}`}>
             {unit}
           </span>
         )}

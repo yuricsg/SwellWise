@@ -1,43 +1,26 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata } from 'next';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "SwellWise - Condições de Praias com IA",
+  title: 'SwellWise - Inteligência Artificial para Praias',
   description:
-    "Descubra as melhores praias do Brasil com condições em tempo real, previsões detalhadas e análises inteligentes com IA.",
-  keywords: [
-    "praias",
-    "surf",
-    "ondas",
-    "previsão",
-    "inteligência artificial",
-    "brasil",
-    "litoral",
-  ],
+    'Descubra o melhor do litoral brasileiro com análise de IA. Condições do mar, temperatura, ondas e muito mais em tempo real.',
+  keywords: ['praias', 'ondas', 'surf', 'brasil', 'inteligência artificial'],
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="pt-BR">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className="bg-background text-foreground">
+        <Navbar />
+        <main className="min-h-screen pt-16">{children}</main>
+        <Footer />
       </body>
     </html>
   );
