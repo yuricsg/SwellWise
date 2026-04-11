@@ -20,6 +20,17 @@ export interface ApiError {
 }
 
 /**
+ * Params for fetching beaches
+ */
+export interface GetBeachesParams {
+  state?: string;
+  city?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+/**
  * Create and configure axios instance
  */
 const createApiClient = (): AxiosInstance => {
@@ -43,21 +54,20 @@ const handleError = (error: unknown): ApiError => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<{ detail?: string }>;
     return {
-      message: axiosError.response?.data?.detail || axiosError.message || "Erro na requisição",
+      message:
+        axiosError.response?.data?.detail ||
+        axiosError.message ||
+        "Erro na requisição",
       status: axiosError.response?.status,
       details: axiosError.response?.data,
     };
   }
 
   if (error instanceof Error) {
-    return {
-      message: error.message,
-    };
+    return { message: error.message };
   }
 
-  return {
-    message: "Erro desconhecido",
-  };
+  return { message: "Erro desconhecido" };
 };
 
 /**
@@ -65,13 +75,9 @@ const handleError = (error: unknown): ApiError => {
  */
 export const beachService = {
   /**
-   * Get all beaches with optional filters
+   * Get beaches with optional filters and pagination
    */
-  async getBeaches(params?: {
-    state?: string;
-    city?: string;
-    search?: string;
-  }): Promise<BeachList> {
+  async getBeaches(params?: GetBeachesParams): Promise<BeachList> {
     try {
       const response = await api.get<BeachList>("/beaches", { params });
       return response.data;
@@ -93,11 +99,17 @@ export const beachService = {
   },
 
   /**
-   * Get beaches by state
+   * Get beaches by state with pagination
    */
-  async getBeachesByState(stateUf: string): Promise<BeachList> {
+  async getBeachesByState(
+    stateUf: string,
+    limit = 6,
+    offset = 0
+  ): Promise<BeachList> {
     try {
-      const response = await api.get<BeachList>(`/beaches/state/${stateUf}`);
+      const response = await api.get<BeachList>(`/beaches/state/${stateUf}`, {
+        params: { limit, offset },
+      });
       return response.data;
     } catch (error) {
       throw handleError(error);
@@ -110,11 +122,13 @@ export const beachService = {
  */
 export const conditionService = {
   /**
-   * Get current conditions for a beach
+   * Get current conditions for a beach (Open-Meteo + Groq)
    */
   async getBeachConditions(beachId: string): Promise<BeachCondition> {
     try {
-      const response = await api.get<BeachCondition>(`/conditions/${beachId}`);
+      const response = await api.get<BeachCondition>(
+        `/conditions/${beachId}`
+      );
       return response.data;
     } catch (error) {
       throw handleError(error);
@@ -124,11 +138,15 @@ export const conditionService = {
   /**
    * Get extended forecast for a beach
    */
-  async getBeachForecast(beachId: string, days: number = 7): Promise<BeachForecast> {
+  async getBeachForecast(
+    beachId: string,
+    days: number = 7
+  ): Promise<BeachForecast> {
     try {
-      const response = await api.get<BeachForecast>(`/conditions/${beachId}/forecast`, {
-        params: { days: Math.min(Math.max(days, 1), 16) },
-      });
+      const response = await api.get<BeachForecast>(
+        `/conditions/${beachId}/forecast`,
+        { params: { days: Math.min(Math.max(days, 1), 16) } }
+      );
       return response.data;
     } catch (error) {
       throw handleError(error);

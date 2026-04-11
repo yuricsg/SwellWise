@@ -52,13 +52,17 @@ COPY --from=builder --chown=swellwise:swellwise /usr/local/bin /usr/local/bin
 COPY --chown=swellwise:swellwise ./app ./app
 COPY --chown=swellwise:swellwise ./alembic ./alembic
 COPY --chown=swellwise:swellwise ./alembic.ini .
+COPY --chown=swellwise:swellwise ./start.sh .
+
+# Garantir permissão de execução no script
+RUN chmod +x ./start.sh
 
 # Expor porta
 EXPOSE 8000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health')"
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
 
-# Comando de inicialização
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Comando de inicialização (roda migrations + servidor)
+CMD ["./start.sh"]
