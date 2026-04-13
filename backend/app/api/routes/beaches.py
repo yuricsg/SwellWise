@@ -50,7 +50,7 @@ def _beach_to_response(beach: Beach) -> BeachResponse:
     )
 
 
-@router.get("/", response_model=BeachList)
+@router.get("", response_model=BeachList)
 async def list_beaches(
     state: Optional[str] = Query(None, description="Filtrar por estado (UF)", max_length=2),
     city: Optional[str] = Query(None, description="Filtrar por cidade"),
