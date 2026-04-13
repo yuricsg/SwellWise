@@ -63,15 +63,17 @@ class Settings(BaseSettings):
     @property
     def ASYNC_DATABASE_URL(self) -> str:
         if self.DATABASE_URL_OVERRIDE:
-            # Substitui o driver para asyncpg
             url = self.DATABASE_URL_OVERRIDE
             if url.startswith("postgresql://"):
-                return url.replace("postgresql://", "postgresql+asyncpg://", 1)
-            if url.startswith("postgres://"):  # Heroku/Neon às vezes usa isso
-                return url.replace("postgres://", "postgresql+asyncpg://", 1)
+                url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            elif url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+            # asyncpg usa ssl=true, não sslmode=require
+            url = url.replace("sslmode=require", "ssl=true")
+            url = url.replace("&channel_binding=require", "")
             return url
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-    
+   
     # Cache
     CACHE_ENABLED: bool = True
     CACHE_TTL: int = 1800  # 30 minutos em segundos
