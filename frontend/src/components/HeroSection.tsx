@@ -33,17 +33,14 @@ export default function HeroSection() {
             <Compass className="h-4 w-4" />
             Explorar Praias
           </button>
-          <button className="flex items-center gap-2 bg-card/60 backdrop-blur-xl border border-border/50 text-foreground font-medium px-6 py-3 rounded-xl hover:border-primary/30 transition-colors">
-            <MapPin className="h-4 w-4 text-primary" />
-            Ver no Mapa
-          </button>
+          
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-6 mt-16 max-w-lg mx-auto animate-slide-up" style={{ animationDelay: '450ms' }}>
           {[
             { value: '100+', label: 'Praias' },
-            { value: '26', label: 'Estados' },
+            { value: '14', label: 'Estados' },
             { value: '98%', label: 'Precisão' },
           ].map((stat) => (
             <div key={stat.label} className="text-center">

@@ -1,12 +1,7 @@
-# Docker Compose para desenvolvimento local
-# Orquestra: API FastAPI, PostgreSQL, pgAdmin4
-
 version: '3.8'
 
 services:
-  # ==============================================
-  # PostgreSQL Database
-  # ==============================================
+
   postgres:
     image: postgres:16-alpine
     container_name: swellwise-postgres
@@ -18,7 +13,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d  # Scripts de inicialização
+      - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
@@ -46,9 +41,6 @@ services:
     depends_on:
       - postgres
 
-  # ==============================================
-  # FastAPI Backend
-  # ==============================================
   api:
     build:
       context: .

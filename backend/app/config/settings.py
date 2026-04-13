@@ -3,8 +3,10 @@ Configurações da aplicação SwellWise
 Gerencia variáveis de ambiente e configurações do sistema
 """
 from pydantic_settings import BaseSettings
+from pydantic import validator
 from functools import lru_cache
 from typing import List
+import json
 
 
 class Settings(BaseSettings):
@@ -22,6 +24,16 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://localhost:8000",
     ]
+
+    @validator("ALLOWED_ORIGINS", pre=True)
+    def parse_origins(cls, v):
+        """Aceita lista Python ou string JSON (para variáveis de ambiente)"""
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return [origin.strip() for origin in v.split(",")]
+        return v
     
     OPEN_METEO_MARINE_URL: str = "https://marine-api.open-meteo.com/v1/marine"
     OPEN_METEO_WEATHER_URL: str = "https://api.open-meteo.com/v1/forecast"
@@ -34,6 +46,8 @@ class Settings(BaseSettings):
     
     # Desenvolvimento: postgresql://usuario:senha@localhost:5432/swellwise
     # Docker: postgresql://swellwise:swellwise123@postgres:5432/swellwise
+    # Produção (Neon, Supabase, etc): use DATABASE_URL_OVERRIDE com a connection string completa
+    DATABASE_URL_OVERRIDE: str = ""  # URL completa do banco (ex: Neon)
     POSTGRES_USER: str = "swellwise"
     POSTGRES_PASSWORD: str = "swellwise123"
     POSTGRES_SERVER: str = "localhost"
@@ -42,10 +56,20 @@ class Settings(BaseSettings):
     
     @property
     def DATABASE_URL(self) -> str:
+        if self.DATABASE_URL_OVERRIDE:
+            return self.DATABASE_URL_OVERRIDE
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
     
     @property
     def ASYNC_DATABASE_URL(self) -> str:
+        if self.DATABASE_URL_OVERRIDE:
+            # Substitui o driver para asyncpg
+            url = self.DATABASE_URL_OVERRIDE
+            if url.startswith("postgresql://"):
+                return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            if url.startswith("postgres://"):  # Heroku/Neon às vezes usa isso
+                return url.replace("postgres://", "postgresql+asyncpg://", 1)
+            return url
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
     
     # Cache

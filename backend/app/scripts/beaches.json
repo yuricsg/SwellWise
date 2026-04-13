@@ -1674,5 +1674,21 @@
         "has_restaurants": true,
         "has_surf_schools": false,
         "warning": "A água pode ser um pouco turva dependendo da maré por causa do estuário do rio, mas o mar é super calmo e seguro."
+    },
+    {
+        "name": "Praia de Zé pequeno",
+        "city": "Olinda",
+        "state": "PE",
+        "region": "Nordeste",
+        "latitude": -8.0204,
+        "longitude": -34.8496,
+        "description": "Praia de Olinda famosa.",
+        "surf_quality": "good",
+        "best_season": "verão",
+        "has_infrastructure": false,
+        "has_parking": true,
+        "has_restaurants": true,
+        "has_surf_schools": false,
+        "warning": "Praia um pouco suja, poluição permanente."
     }
 ]

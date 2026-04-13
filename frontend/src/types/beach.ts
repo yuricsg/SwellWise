@@ -10,11 +10,20 @@ export interface Beach {
   latitude: number;
   longitude: number;
   description: string;
-  created_at: string;
+  slug?: string;
+  region?: string;
+  surf_quality?: string;
+  best_season?: string;
+  tags: string[];
+  warning?: string | null;
+  created_at?: string;
 }
 
 export interface BeachList {
   total: number;
+  limit: number;
+  offset: number;
+  has_more: boolean;
   beaches: Beach[];
 }
 
@@ -23,7 +32,7 @@ export interface BeachList {
  */
 export interface WaveData {
   height: number;
-  direction?: number | null;
+  direction?: string | null;
   period?: number | null;
   swell_height?: number | null;
   swell_period?: number | null;
@@ -34,7 +43,7 @@ export interface WaveData {
  */
 export interface WindData {
   speed: number;
-  direction?: number | null;
+  direction?: string | null;
   gusts?: number | null;
 }
 
@@ -62,14 +71,13 @@ export interface ActivityRating {
 }
 
 /**
- * AI Analysis from Groq
+ * AI Analysis from Groq — matches backend AIReview schema
  */
 export interface AIReview {
-  summary: string;
-  recommendation: string;
-  ideal_time?: string;
-  warnings?: string[];
-  highlights?: string[];
+  review_pt: string;
+  recommendations: string[];
+  warnings: string[];
+  best_time?: string | null;
 }
 
 /**
@@ -83,7 +91,7 @@ export interface BeachCondition {
   wind: WindData;
   weather: WeatherData;
   ratings: ActivityRating;
-  ai_review?: AIReview;
+  ai_review?: AIReview | null;
 }
 
 /**
