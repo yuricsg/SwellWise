@@ -79,7 +79,7 @@ export const beachService = {
    */
   async getBeaches(params?: GetBeachesParams): Promise<BeachList> {
     try {
-      const response = await api.get<BeachList>("/beaches", { params });
+      const response = await api.get<BeachList>("/beaches/", { params });
       return response.data;
     } catch (error) {
       throw handleError(error);
