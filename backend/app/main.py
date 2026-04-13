@@ -33,7 +33,8 @@ app = FastAPI(
     description=settings.APP_DESCRIPTION,
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    redirect_slashes=False
 )
 
 # Configurar CORS
@@ -93,3 +94,4 @@ async def global_exception_handler(request, exc):
             "error": str(exc) if settings.DEBUG else "Internal Server Error"
         }
     )
+
