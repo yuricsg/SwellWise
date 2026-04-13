@@ -30,7 +30,8 @@ async_engine = create_async_engine(
     echo=settings.DEBUG,
     pool_pre_ping=True,
     pool_size=10,
-    max_overflow=20
+    max_overflow=20,
+    connect_args={"ssl": "require"}
 )
 
 # Session factory assíncrona
