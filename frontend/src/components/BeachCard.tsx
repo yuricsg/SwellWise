@@ -11,24 +11,9 @@ interface BeachCardProps {
   index?: number;
 }
 
-const ACCENT_COLORS = [
-  'from-blue-500 to-cyan-400',
-  'from-emerald-500 to-teal-400',
-  'from-violet-500 to-pink-400',
-  'from-orange-500 to-amber-400',
-  'from-rose-500 to-pink-400',
-  'from-indigo-500 to-blue-400',
-];
 
-const QUALITY_LABEL: Record<string, string> = {
-  excellent: '🏄 Excelente',
-  good: '👍 Boa',
-  fair: '😐 Regular',
-  poor: '🌊 Tranquila',
-};
 
 export default function BeachCard({ beach, index = 0 }: BeachCardProps) {
-  const accent = ACCENT_COLORS[Math.abs(parseInt(beach.id)) % ACCENT_COLORS.length];
 
   return (
     <Link href={`/beach/${beach.id}`} className="group block h-full outline-none">
@@ -42,7 +27,7 @@ export default function BeachCard({ beach, index = 0 }: BeachCardProps) {
         style={{ animationDelay: `${index * 80}ms` }}
       >
         {/* Accent bar – thin colored stripe at top */}
-        <div className={cn('h-1 w-full bg-gradient-to-r shrink-0', accent)} />
+        <div className="h-1 w-full bg-gradient-to-r from-primary to-cyan-400 shrink-0" />
 
         {/* Card body */}
         <div className="p-5 flex flex-col flex-1">
@@ -52,11 +37,7 @@ export default function BeachCard({ beach, index = 0 }: BeachCardProps) {
             <h3 className="font-bold text-foreground text-lg leading-snug group-hover:text-primary transition-colors">
               {beach.name}
             </h3>
-            {beach.surf_quality && (
-              <span className="shrink-0 text-[10px] font-semibold text-muted-foreground bg-secondary/60 border border-border/40 rounded-full px-2 py-0.5 whitespace-nowrap mt-0.5">
-                {QUALITY_LABEL[beach.surf_quality] ?? beach.surf_quality}
-              </span>
-            )}
+
           </div>
 
           {/* Location */}
