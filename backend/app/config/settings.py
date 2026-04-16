@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
     GROQ_ENABLED: bool = True 
     
-    DATABASE_URL_OVERRIDE: str = "postgresql://neondb_owner:npg_Q5HfATWG4Ovi@ep-spring-meadow-acl9pgmq-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"  # URL completa do banco (ex: Neon)
+    DATABASE_URL_OVERRIDE: str = ""
     POSTGRES_USER: str = "swellwise"
     POSTGRES_PASSWORD: str = "swellwise123"
     POSTGRES_SERVER: str = "localhost"

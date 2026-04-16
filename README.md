@@ -8,6 +8,11 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel)](https://swell-wise.vercel.app/)
+
+## 🚀 [Acesse o site→ swell-wise.vercel.app](https://swell-wise.vercel.app/)
+
+---
 
 ## Sobre o Projeto
 
