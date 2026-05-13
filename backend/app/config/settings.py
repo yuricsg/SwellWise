@@ -23,7 +23,11 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",
+        "https://swellwise.vercel.app",
     ]
+
+    # CORS - Regex para origens dinâmicas (ex: previews do Vercel)
+    ALLOWED_ORIGIN_REGEX: str = r"https://swell-wise.*\.vercel\.app"
 
     @validator("ALLOWED_ORIGINS", pre=True)
     def parse_origins(cls, v):
